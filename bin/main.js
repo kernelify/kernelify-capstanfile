@@ -25,9 +25,6 @@ var files = collectFiles(baseDir)
     return '    ' + prefix + '/' + file + ': ' + file;
   })
   .join('\n');
-var ignores = [
-  '.*'
-].map(globToRegExp);
 console.log(template + '\n' + files);
 
 function collectFiles(dir) {
