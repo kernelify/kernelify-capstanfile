@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var util = require('util');
 var globToRegExp = require('glob-to-regexp');
 
 var argv = require('optimist')
@@ -10,8 +11,9 @@ var argv = require('optimist')
 
 var template = [
   'base: cloudius/osv-node\n',
-  'cmdline: /libnode.so /hello.js\n',
-  'files:'
+  'cmdline: /libnode.so %s/%s\n',
+  'files:',
+  '%s'
 ].join('\n');
 var prefix = '/app';
 
@@ -25,7 +27,10 @@ var files = collectFiles(baseDir)
     return '    ' + prefix + '/' + file + ': ' + file;
   })
   .join('\n');
-console.log(template + '\n' + files);
+
+var main = 'server.js';
+var capstanfile = util.format(template, prefix, main, files);
+console.log(capstanfile);
 
 function collectFiles(dir) {
   var files = [];
