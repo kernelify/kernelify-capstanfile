@@ -20,13 +20,13 @@ var ignores = [
 var baseDir = argv._[0] || process.cwd();
 var files = collectFiles(baseDir)
   .map(function(file) {
-    return '\t' + prefix + '/' + file + ': ' + file;
+    return '    ' + prefix + '/' + file + ': ' + file;
   })
   .join('\n');
 var ignores = [
   '.*'
 ].map(globToRegExp);
-console.log(template + files);
+console.log(template + '\n' + files);
 
 function collectFiles(dir) {
   var files = [];
