@@ -16,7 +16,7 @@ var template = [
 var prefix = '/app';
 
 var ignores = [
-  '.*'
+  '.git'
 ].map(globToRegExp);
 
 var baseDir = argv._[0] || process.cwd();
