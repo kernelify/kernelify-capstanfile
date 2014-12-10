@@ -31,11 +31,11 @@ function collectFiles(dir) {
   var files = [];
 
   fs.readdirSync(dir)
-    .forEach(process);
+    .forEach(dealWith);
 
   return files;
 
-  function process(node) {
+  function dealWith(node) {
     if (ignore(node))
         return;
 
