@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
 var path = require('path');
 var util = require('util');
-var globToRegExp = require('glob-to-regexp');
+
+var findFiles = require('../lib/find-files');
 
 var argv = require('optimist')
     .usage('Usage: $0 [directory]')
@@ -17,49 +17,23 @@ var template = [
 ].join('\n');
 var prefix = '/app';
 
-var ignores = [
-  '.git'
-].map(globToRegExp);
-
-var baseDir = argv._[0] || process.cwd();
-var files = collectFiles(baseDir)
-  .map(function(file) {
-    return '    ' + prefix + '/' + file + ': ' + file;
-  })
+var dir = argv._[0] || process.cwd();
+var ignores = [ '.git' ];
+var files = findFiles(dir, ignores)
+  .map(function(file) { return '    ' + prefix + '/' + file + ': ' + file; })
   .join('\n');
 
-var main = 'server.js';
+var file = function(f) { return ~files.indexOf(prefix + '/' + f) && f; };
+var package = {};
+if (file('package.json'))
+  try { package = require(path.join(dir, 'package.json')); } catch(e) {}
+
+var main = package.entry ||
+  file('server.js') ||
+  file('main.js') ||
+  file('index.js') ||
+  file('bin/main.js') ||
+  'server.js';
+
 var capstanfile = util.format(template, prefix, main, files);
 console.log(capstanfile);
-
-function collectFiles(dir) {
-  var files = [];
-
-  fs.readdirSync(dir)
-    .forEach(dealWith);
-
-  return files;
-
-  function dealWith(node) {
-    if (ignore(node))
-        return;
-
-    var fullPath = path.join(dir, node);
-    if (fs.statSync(fullPath).isDirectory())
-      files = files.concat(collectFiles(fullPath));
-    else
-      files.push(path.relative(baseDir, fullPath));
-  }
-
-  function addFiles(add) {
-    files = files.concat(add);
-  }
-}
-
-function ignore(p) {
-  return ignores.some(matches);
-
-  function matches(regexp) {
-    return regexp.test(p);
-  }
-}
